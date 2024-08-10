@@ -1,9 +1,11 @@
-import React from "react";
-import { useAccount, useDisconnect } from "wagmi";
-import * as Dialog from "@radix-ui/react-dialog";
+import React, { useEffect, useState } from "react";
+import { useAccount, useLogout, useUser } from "@alchemy/aa-alchemy/react";
 import styles from "./ModalAccount.module.css";
-import { getIcon } from "@/utils/connectors";
 import SpaceDialog from "@/components/__common/SpaceDialog";
+import { getEnsAvatar, getEnsName } from "@wagmi/core";
+import { getConfig } from "@/wagmi";
+import { normalize } from "viem/ens";
+import { accountType } from "@/alchemy";
 
 interface ModalAccountProps {
   open: boolean;
@@ -11,15 +13,43 @@ interface ModalAccountProps {
 }
 
 const ModalAccount: React.FC<ModalAccountProps> = ({ open, onOpenChange }) => {
-  const { address, connector } = useAccount();
-  const { disconnect } = useDisconnect();
+  const user = useUser();
+  const { address } = useAccount({
+    type: accountType,
+  });
+  const { logout } = useLogout();
 
-  const connectorIcon = connector ? getIcon(connector) : undefined;
-  const connectorName = connector ? connector.name : undefined;
-  const accountAddress = address || "Account";
+  const [ensName, setEnsName] = useState<string | null>(null);
+  const [ensAvatar, setEnsAvatar] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const config = getConfig();
+      if (user) {
+        const name = await getEnsName(config, {
+          address: user.address,
+        });
+        setEnsName(name);
+      }
+    };
+    fetchData();
+  }, [user]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const config = getConfig();
+      if (ensName) {
+        const avatar = await getEnsAvatar(config, {
+          name: normalize(ensName),
+        });
+        setEnsAvatar(avatar);
+      }
+    };
+    fetchData();
+  }, [ensName]);
 
   const handleDisconnectClick = () => {
-    disconnect();
+    logout();
     onOpenChange(false);
   };
 
@@ -27,19 +57,14 @@ const ModalAccount: React.FC<ModalAccountProps> = ({ open, onOpenChange }) => {
     <SpaceDialog title="Account" open={open} onOpenChange={onOpenChange}>
       <div className={styles.content}>
         <div className={styles.walletMain}>
-          <div className={styles.connector}>
-            {connectorIcon && (
-              <img
-                src={connectorIcon}
-                alt="icon"
-                className={styles.connectorIcon}
-              />
+          <div className={styles.ens}>
+            {ensAvatar && (
+              <img src={ensAvatar} alt="icon" className={styles.ensIcon} />
             )}
-            {connectorName && (
-              <div className={styles.connectorName}>{connectorName}</div>
-            )}
+            {ensName && <div>{ensName}</div>}
           </div>
-          <div>{accountAddress}</div>
+          {user?.email && <div>Email: {user.email}</div>}
+          {address && <div>Address: {address}</div>}
         </div>
         <div>
           <button onClick={handleDisconnectClick}>Disconnect</button>

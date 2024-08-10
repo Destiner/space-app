@@ -1,11 +1,11 @@
-import { useAccount } from "wagmi";
 import ChipAccount from "./ChipAccount";
-import ButtonConnect from "./ButtonConnect";
+import ButtonLogIn from "./ButtonLogIn";
+import { useSignerStatus } from "@alchemy/aa-alchemy/react";
 
 const ButtonWallet: React.FC = () => {
-  const { isConnected } = useAccount();
+  const { isConnected } = useSignerStatus();
 
-  return isConnected ? <ChipAccount /> : <ButtonConnect />;
+  return isConnected ? <ChipAccount /> : <ButtonLogIn />;
 };
 
 export default ButtonWallet;

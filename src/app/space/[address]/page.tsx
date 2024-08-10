@@ -3,25 +3,34 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 import { useQuery } from "@tanstack/react-query";
-import {
-  useReadContract,
-  useWriteContract,
-  useTransactionReceipt,
-  useAccount,
-  useEnsName,
-  useEnsAvatar,
-} from "wagmi";
 import request from "graphql-request";
 import * as Avatar from "@radix-ui/react-avatar";
-import { Address, encodePacked, getAddress, Hex, keccak256 } from "viem";
+import {
+  Address,
+  encodeFunctionData,
+  encodePacked,
+  getAddress,
+  Hex,
+  keccak256,
+} from "viem";
 
 import easAbi from "@/abi/eas";
 import spaceAbi from "@/abi/space";
 import ItemEditor, { type Item } from "@/components/new/ItemEditor";
 import { graphql } from "@/gql/gql";
+import { accountType, gasManagerConfig } from "@/alchemy";
 
 import styles from "./page.module.css";
 import { normalize } from "viem/ens";
+import { getEnsAvatar, getEnsName, readContract } from "@wagmi/core";
+import {
+  useAccount,
+  useSendUserOperation,
+  useSignerStatus,
+  useSmartAccountClient,
+  useUser,
+} from "@alchemy/aa-alchemy/react";
+import { getConfig } from "@/wagmi";
 
 const easContractAddress = "0xC2679fBD37d54388Ce493F1DB75320D236e1815e";
 const schemaUID =
@@ -62,39 +71,64 @@ type Props = {
 
 const Space: React.FC<Props> = ({ params }: Props) => {
   const { address } = params;
-  const { address: accountAddress } = useAccount();
+  const user = useUser();
+  const { address: accountAddress } = useAccount({
+    type: accountType,
+  });
 
   const [formVisible, setFormVisible] = useState(false);
   const [item, setItem] = useState<Item | undefined>(undefined);
   const [bioEditorVisible, setBioEditorVisible] = useState(false);
   const [bio, setBio] = useState("");
 
-  const { data: hash, writeContract } = useWriteContract();
-  const { data: receipt } = useTransactionReceipt({ hash });
-
-  const ownerRequest = useReadContract({
-    abi: spaceAbi,
-    address: address as Address,
-    functionName: "owner",
-    args: [],
+  const { isConnected } = useSignerStatus();
+  const { client } = useSmartAccountClient({
+    type: accountType,
+    gasManagerConfig,
   });
 
-  const bioRequest = useReadContract({
-    abi: spaceAbi,
-    address: address as Address,
-    functionName: "bio",
-    args: [],
+  const ownerRequest = useQuery({
+    queryKey: ["owner", address],
+    queryFn: async () => {
+      return await readContract(getConfig(), {
+        abi: spaceAbi,
+        address: address as Address,
+        functionName: "owner",
+        args: [],
+      });
+    },
+  });
+  const bioRequest = useQuery({
+    queryKey: ["bio", address],
+    queryFn: async () => {
+      return await readContract(getConfig(), {
+        abi: spaceAbi,
+        address: address as Address,
+        functionName: "bio",
+        args: [],
+      });
+    },
+  });
+  const linksRequest = useQuery({
+    queryKey: ["links", address],
+    queryFn: async () => {
+      return await readContract(getConfig(), {
+        abi: spaceAbi,
+        address: address as Address,
+        functionName: "getLinks",
+        args: [0n, 100n],
+      });
+    },
   });
 
-  const linksRequest = useReadContract({
-    abi: spaceAbi,
-    address: address as Address,
-    functionName: "getLinks",
-    args: [0n, 100n],
-  });
+  const { sendUserOperation, sendUserOperationResult, isSendingUserOperation } =
+    useSendUserOperation({ client, waitForTxn: true });
 
-  const owner = ownerRequest.data;
-  const isOwner = owner === accountAddress;
+  const owner = useMemo(() => ownerRequest.data, [ownerRequest]);
+  const isOwner = useMemo<boolean>(
+    () => owner === accountAddress,
+    [owner, accountAddress]
+  );
 
   const { data: spaceAttestations } = useQuery({
     queryKey: ["spaceAttestations", owner, accountAddress],
@@ -114,18 +148,40 @@ const Space: React.FC<Props> = ({ params }: Props) => {
   );
 
   useEffect(() => {
-    if (receipt) {
+    if (sendUserOperationResult) {
       linksRequest.refetch();
       bioRequest.refetch();
     }
-  }, [receipt, linksRequest, bioRequest]);
+  });
 
-  const ensName = useEnsName({
-    address: owner,
-  });
-  const ensAvatar = useEnsAvatar({
-    name: normalize(ensName.data || ""),
-  });
+  const [ensName, setEnsName] = useState<string | null>(null);
+  const [ensAvatar, setEnsAvatar] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const config = getConfig();
+      if (user) {
+        const name = await getEnsName(config, {
+          address: user.address,
+        });
+        setEnsName(name);
+      }
+    };
+    fetchData();
+  }, [user]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const config = getConfig();
+      if (ensName) {
+        const avatar = await getEnsAvatar(config, {
+          name: normalize(ensName),
+        });
+        setEnsAvatar(avatar);
+      }
+    };
+    fetchData();
+  }, [ensName]);
 
   useEffect(() => {
     setBio(bioRequest.data || "");
@@ -135,11 +191,15 @@ const Space: React.FC<Props> = ({ params }: Props) => {
     if (!linksRequest.data || !address) return;
     const prevItem = linksRequest.data[index - 1];
     const prevId = prevItem ? getLinkId(prevItem) : 0n;
-    writeContract({
-      abi: spaceAbi,
-      address: address as Address,
-      functionName: "removeLink",
-      args: [prevId],
+    sendUserOperation({
+      uo: {
+        target: address as Address,
+        data: encodeFunctionData({
+          abi: spaceAbi,
+          functionName: "removeLink",
+          args: [prevId],
+        }),
+      },
     });
   };
 
@@ -147,11 +207,15 @@ const Space: React.FC<Props> = ({ params }: Props) => {
     if (!linksRequest.data || !address || !item) return;
     const prevItem = linksRequest.data[linksRequest.data.length - 1];
     const prevId = prevItem ? getLinkId(prevItem) : 0n;
-    writeContract({
-      abi: spaceAbi,
-      address: address as Address,
-      functionName: "addLink",
-      args: [prevId, item.label, item.value],
+    sendUserOperation({
+      uo: {
+        target: address as Address,
+        data: encodeFunctionData({
+          abi: spaceAbi,
+          functionName: "addLink",
+          args: [prevId, item.label, item.value],
+        }),
+      },
     });
     setFormVisible(false);
   };
@@ -168,34 +232,42 @@ const Space: React.FC<Props> = ({ params }: Props) => {
     const encodedData = schemaEncoder.encodeData([
       { name: "reason", value: "", type: "string" },
     ]) as Hex;
-    writeContract({
-      abi: easAbi,
-      address: easContractAddress,
-      functionName: "attest",
-      args: [
-        {
-          schema: schemaUID,
-          data: {
-            data: encodedData,
-            revocable: true,
-            recipient: address as Address,
-            refUID:
-              "0x0000000000000000000000000000000000000000000000000000000000000000",
-            value: 0n,
-            expirationTime: 0n,
-          },
-        },
-      ],
+    sendUserOperation({
+      uo: {
+        target: easContractAddress,
+        data: encodeFunctionData({
+          abi: easAbi,
+          functionName: "attest",
+          args: [
+            {
+              schema: schemaUID,
+              data: {
+                data: encodedData,
+                revocable: true,
+                recipient: address as Address,
+                refUID:
+                  "0x0000000000000000000000000000000000000000000000000000000000000000",
+                value: 0n,
+                expirationTime: 0n,
+              },
+            },
+          ],
+        }),
+      },
     });
   };
 
   const saveBio = () => {
     if (!address) return;
-    writeContract({
-      abi: spaceAbi,
-      address: address as Address,
-      functionName: "setBio",
-      args: [bio],
+    sendUserOperation({
+      uo: {
+        target: address as Address,
+        data: encodeFunctionData({
+          abi: spaceAbi,
+          functionName: "setBio",
+          args: [bio],
+        }),
+      },
     });
     setBioEditorVisible(false);
   };
@@ -208,10 +280,10 @@ const Space: React.FC<Props> = ({ params }: Props) => {
           {owner && (
             <div className={styles.ens}>
               <Avatar.Root>
-                {ensAvatar.data ? (
+                {ensAvatar ? (
                   <Avatar.Image
                     className={styles.avatar}
-                    src={ensAvatar.data}
+                    src={ensAvatar}
                     alt="ENS avatar"
                   />
                 ) : (
@@ -220,7 +292,7 @@ const Space: React.FC<Props> = ({ params }: Props) => {
                   />
                 )}
               </Avatar.Root>
-              {ensName && <div className={styles.name}>{ensName.data}</div>}
+              {ensName && <div className={styles.name}>{ensName}</div>}
             </div>
           )}
           <div className={styles.bio}>
@@ -251,6 +323,7 @@ const Space: React.FC<Props> = ({ params }: Props) => {
                 ) : (
                   <button
                     className="button"
+                    disabled={!isConnected || isSendingUserOperation}
                     onClick={() => setBioEditorVisible(true)}
                   >
                     {bioRequest.data ? "Edit" : "Add bio"}
@@ -262,7 +335,11 @@ const Space: React.FC<Props> = ({ params }: Props) => {
           {!isOwner && (
             <div>
               {!isEndorsed ? (
-                <button className="button" onClick={endorse}>
+                <button
+                  className="button"
+                  disabled={!isConnected || isSendingUserOperation}
+                  onClick={endorse}
+                >
                   Endorse
                 </button>
               ) : (

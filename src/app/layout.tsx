@@ -3,10 +3,10 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { headers } from "next/headers";
 import { type ReactNode } from "react";
-import { cookieToInitialState } from "wagmi";
+import { cookieToInitialState } from "@alchemy/aa-alchemy/config";
 import AppHeader from "@/components/_app/AppHeader";
+import { config } from "@/alchemy";
 
-import { getConfig } from "../wagmi";
 import { Providers } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -18,8 +18,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout(props: { children: ReactNode }) {
   const initialState = cookieToInitialState(
-    getConfig(),
-    headers().get("cookie")
+    config,
+    headers().get("cookie") || undefined
   );
   return (
     <html lang="en">
