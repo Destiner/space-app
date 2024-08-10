@@ -1,0 +1,18 @@
+.chip {
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  gap: 8px;
+}
+
+.chip:hover {
+  background: rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
