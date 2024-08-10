@@ -3,6 +3,7 @@ import { useAccount, useDisconnect } from "wagmi";
 import * as Dialog from "@radix-ui/react-dialog";
 import styles from "./ModalAccount.module.css";
 import { getIcon } from "@/utils/connectors";
+import SpaceDialog from "@/components/__common/SpaceDialog";
 
 interface ModalAccountProps {
   open: boolean;
@@ -23,34 +24,28 @@ const ModalAccount: React.FC<ModalAccountProps> = ({ open, onOpenChange }) => {
   };
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Portal>
-        <Dialog.Overlay />
-        <Dialog.Content>
-          <Dialog.Title>Account</Dialog.Title>
-          <div className={styles.content}>
-            <div className={styles.walletMain}>
-              <div className={styles.connector}>
-                {connectorIcon && (
-                  <img
-                    src={connectorIcon}
-                    alt="icon"
-                    className={styles.connectorIcon}
-                  />
-                )}
-                {connectorName && (
-                  <div className={styles.connectorName}>{connectorName}</div>
-                )}
-              </div>
-              <div>{accountAddress}</div>
-            </div>
-            <div>
-              <button onClick={handleDisconnectClick}>Disconnect</button>
-            </div>
+    <SpaceDialog title="Account" open={open} onOpenChange={onOpenChange}>
+      <div className={styles.content}>
+        <div className={styles.walletMain}>
+          <div className={styles.connector}>
+            {connectorIcon && (
+              <img
+                src={connectorIcon}
+                alt="icon"
+                className={styles.connectorIcon}
+              />
+            )}
+            {connectorName && (
+              <div className={styles.connectorName}>{connectorName}</div>
+            )}
           </div>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+          <div>{accountAddress}</div>
+        </div>
+        <div>
+          <button onClick={handleDisconnectClick}>Disconnect</button>
+        </div>
+      </div>
+    </SpaceDialog>
   );
 };
 
