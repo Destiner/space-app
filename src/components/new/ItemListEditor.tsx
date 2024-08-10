@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ItemEditor, { Item } from "./ItemEditor";
-import styles from "./Editor.module.css";
+import styles from "./ItemListEditor.module.css";
 
 interface ItemListEditorProps {
   initialModel: Item[];
