@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import { headers } from "next/headers";
 import { type ReactNode } from "react";
 import { cookieToInitialState } from "wagmi";
+import AppHeader from "@/components/_app/AppHeader";
 
 import { getConfig } from "../wagmi";
 import { Providers } from "./providers";
@@ -24,6 +25,7 @@ export default function RootLayout(props: { children: ReactNode }) {
     <html lang="en">
       <body className={inter.className}>
         <Providers initialState={initialState}>
+          <AppHeader />
           <div>{props.children}</div>
         </Providers>
       </body>
