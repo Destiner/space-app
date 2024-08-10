@@ -1,12 +1,11 @@
 import React, { useState, useMemo } from "react";
 import { useAccount, useEnsName } from "wagmi";
-import * as Dialog from "@radix-ui/react-dialog";
 import { getIcon } from "@/utils/connectors";
 import { formatAddress } from "@/utils/formatters";
 import ModalAccount from "./ModalAccount";
 import styles from "./Chip.module.css";
 
-const Chip: React.FC = () => {
+const ChipAccount: React.FC = () => {
   const [open, setOpen] = useState(false);
   const { address, connector } = useAccount();
   const { data: ensName } = useEnsName({ address });
@@ -45,4 +44,4 @@ const Chip: React.FC = () => {
   );
 };
 
-export default Chip;
+export default ChipAccount;
