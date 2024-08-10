@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import styles from "./Editor.module.css";
+import styles from "./ItemEditor.module.css";
 
 interface Item {
   label: string;
