@@ -1,9 +1,11 @@
+"use client";
+
 import style from "./AppHeader.module.css";
 import ButtonWallet from "./header/ButtonWallet";
 
 const AppHeader: React.FC = () => {
   return (
-    <header>
+    <header className={style.header}>
       <div className={style.side}>
         <a href="/">Home</a>
       </div>
