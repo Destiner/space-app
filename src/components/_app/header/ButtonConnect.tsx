@@ -1,7 +1,7 @@
 import { useState } from "react";
 import ModalConnectors from "./ModalConnectors";
 
-const Chip: React.FC = () => {
+const ButtonConnect: React.FC = () => {
   const [open, setOpen] = useState(false);
 
   const openModal = () => setOpen(true);
@@ -14,3 +14,5 @@ const Chip: React.FC = () => {
     </>
   );
 };
+
+export default ButtonConnect;
