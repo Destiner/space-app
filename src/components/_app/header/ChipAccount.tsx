@@ -3,7 +3,7 @@ import { useAccount, useEnsName } from "wagmi";
 import { getIcon } from "@/utils/connectors";
 import { formatAddress } from "@/utils/formatters";
 import ModalAccount from "./ModalAccount";
-import styles from "./Chip.module.css";
+import styles from "./ChipAccount.module.css";
 
 const ChipAccount: React.FC = () => {
   const [open, setOpen] = useState(false);
