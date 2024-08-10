@@ -1,0 +1,109 @@
+.page {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  padding: 16px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  width: 480px;
+  gap: 32px;
+}
+
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.list {
+  display: flex;
+  gap: 24px;
+  flex-direction: column;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.link {
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.value {
+  font-size: 24px;
+}
+
+.buttons {
+  display: flex;
+  gap: 16px;
+}
+
+.button {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.small {
+  opacity: 0.6;
+  font-size: 14px;
+
+  &:hover {
+    color: black;
+  }
+}
+
+.large {
+  opacity: 0.8;
+  font-size: 20px;
+
+  &:hover {
+    color: black;
+  }
+}
+
+.ens {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+
+  .avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+
+    &.fallback {
+      display: block;
+      background: #f0f0f0;
+    }
+  }
+
+  .name {
+    font-size: 24px;
+  }
+}
+
+.bio {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bio-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
