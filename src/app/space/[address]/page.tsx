@@ -21,8 +21,7 @@ import { graphql } from "@/gql/gql";
 import { accountType, gasManagerConfig } from "@/alchemy";
 
 import styles from "./page.module.css";
-import { normalize } from "viem/ens";
-import { getEnsAvatar, getEnsName, readContract } from "@wagmi/core";
+import { readContract } from "@wagmi/core";
 import {
   useAccount,
   useSendUserOperation,
@@ -30,7 +29,7 @@ import {
   useSmartAccountClient,
   useUser,
 } from "@alchemy/aa-alchemy/react";
-import { getConfig, getEnsConfig } from "@/wagmi";
+import { getConfig } from "@/wagmi";
 import ReorderableItemList from "@/components/space/ReorderableList";
 
 const easContractAddress = "0x4200000000000000000000000000000000000021";
@@ -188,35 +187,6 @@ const Space: React.FC<Props> = ({ params }: Props) => {
       bioRequest.refetch();
     }
   });
-
-  const [ensName, setEnsName] = useState<string | null>(null);
-  const [ensAvatar, setEnsAvatar] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const config = getEnsConfig();
-      if (user) {
-        const name = await getEnsName(config, {
-          address: user.address,
-        });
-        setEnsName(name);
-      }
-    };
-    fetchData();
-  }, [user]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const config = getEnsConfig();
-      if (ensName) {
-        const avatar = await getEnsAvatar(config, {
-          name: normalize(ensName),
-        });
-        setEnsAvatar(avatar);
-      }
-    };
-    fetchData();
-  }, [ensName]);
 
   useEffect(() => {
     setBio(bioRequest.data || "");
@@ -377,24 +347,6 @@ const Space: React.FC<Props> = ({ params }: Props) => {
       <div className={styles.content}>
         <h1>Space</h1>
         <div className={styles.view}>
-          {owner && (
-            <div className={styles.ens}>
-              <Avatar.Root>
-                {ensAvatar ? (
-                  <Avatar.Image
-                    className={styles.avatar}
-                    src={ensAvatar}
-                    alt="ENS avatar"
-                  />
-                ) : (
-                  <Avatar.Fallback
-                    className={`${styles.avatar} ${styles.fallback}`}
-                  />
-                )}
-              </Avatar.Root>
-              {ensName && <div className={styles.name}>{ensName}</div>}
-            </div>
-          )}
           <div className={styles.name}>
             {nameRequest.data && !nameEditorVisible && (
               <div>{nameRequest.data}</div>
