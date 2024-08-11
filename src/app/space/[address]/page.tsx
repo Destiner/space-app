@@ -283,6 +283,7 @@ const Space: React.FC<Props> = ({ params }: Props) => {
 
   function handleSaveClick() {
     addItem();
+    setItem(undefined);
   }
 
   return (
