@@ -3,7 +3,7 @@ import { useAccount, useLogout, useUser } from "@alchemy/aa-alchemy/react";
 import styles from "./ModalAccount.module.css";
 import SpaceDialog from "@/components/__common/SpaceDialog";
 import { getEnsAvatar, getEnsName } from "@wagmi/core";
-import { getConfig } from "@/wagmi";
+import { getEnsConfig } from "@/wagmi";
 import { normalize } from "viem/ens";
 import { accountType } from "@/alchemy";
 
@@ -24,7 +24,7 @@ const ModalAccount: React.FC<ModalAccountProps> = ({ open, onOpenChange }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const config = getConfig();
+      const config = getEnsConfig();
       if (user) {
         const name = await getEnsName(config, {
           address: user.address,
@@ -37,7 +37,7 @@ const ModalAccount: React.FC<ModalAccountProps> = ({ open, onOpenChange }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const config = getConfig();
+      const config = getEnsConfig();
       if (ensName) {
         const avatar = await getEnsAvatar(config, {
           name: normalize(ensName),

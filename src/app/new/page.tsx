@@ -16,7 +16,7 @@ import {
 import { accountType, gasManagerConfig } from "@/alchemy";
 import { getConfig } from "@/wagmi";
 
-const SPACE_FACTORY_ADDRESS = "0xdfe6cea709b58e2a112729a1a4cf8a7a8eb7c508";
+const SPACE_FACTORY_ADDRESS = "0x497d9a170b4decf47338d925930d39f87e0e6a5b";
 
 const CreateSpace: React.FC = () => {
   const router = useRouter();
@@ -96,4 +96,21 @@ const CreateSpace: React.FC = () => {
   );
 };
 
-export default CreateSpace;
+const CreateSpaceAuth: React.FC = () => {
+  const { isConnected } = useSignerStatus();
+
+  if (!isConnected) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.content}>
+          <h1>Sign In</h1>
+          <p>You need to authorize to create a space.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return <CreateSpace />;
+};
+
+export default CreateSpaceAuth;

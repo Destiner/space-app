@@ -30,9 +30,9 @@ import {
   useSmartAccountClient,
   useUser,
 } from "@alchemy/aa-alchemy/react";
-import { getConfig } from "@/wagmi";
+import { getConfig, getEnsConfig } from "@/wagmi";
 
-const easContractAddress = "0xC2679fBD37d54388Ce493F1DB75320D236e1815e";
+const easContractAddress = "0x4200000000000000000000000000000000000021";
 const schemaUID =
   "0x5e331c5631c07b6df8b7e28a30cf3ea91d33af545e84e3b0aaf4c12dc3fea507";
 
@@ -133,10 +133,14 @@ const Space: React.FC<Props> = ({ params }: Props) => {
   const { data: spaceAttestations } = useQuery({
     queryKey: ["spaceAttestations", owner, accountAddress],
     queryFn: async () =>
-      request("https://sepolia.easscan.org/graphql", spaceAttestationQuery, {
-        recipient: getAddress(address),
-        context: accountAddress,
-      }),
+      request(
+        "https://base-sepolia.easscan.org/graphql",
+        spaceAttestationQuery,
+        {
+          recipient: getAddress(address),
+          context: accountAddress,
+        }
+      ),
   });
 
   const isEndorsed = useMemo<boolean>(
@@ -159,7 +163,7 @@ const Space: React.FC<Props> = ({ params }: Props) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const config = getConfig();
+      const config = getEnsConfig();
       if (user) {
         const name = await getEnsName(config, {
           address: user.address,
@@ -172,7 +176,7 @@ const Space: React.FC<Props> = ({ params }: Props) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const config = getConfig();
+      const config = getEnsConfig();
       if (ensName) {
         const avatar = await getEnsAvatar(config, {
           name: normalize(ensName),
@@ -271,6 +275,15 @@ const Space: React.FC<Props> = ({ params }: Props) => {
     });
     setBioEditorVisible(false);
   };
+
+  function handleCancelClick() {
+    setFormVisible(false);
+    setItem(undefined);
+  }
+
+  function handleSaveClick() {
+    addItem();
+  }
 
   return (
     <div className={styles.page}>
@@ -371,12 +384,16 @@ const Space: React.FC<Props> = ({ params }: Props) => {
                     <>
                       <ItemEditor initialItem={item} onChange={setItem} />
                       <div className={styles.buttons}>
-                        <button className={styles.large} onClick={addItem}>
+                        <button
+                          disabled={isSendingUserOperation}
+                          className={styles.large}
+                          onClick={() => handleSaveClick()}
+                        >
                           Save
                         </button>
                         <button
                           className={`button ${styles.large}`}
-                          onClick={() => setFormVisible(false)}
+                          onClick={() => handleCancelClick()}
                         >
                           Cancel
                         </button>

@@ -3,7 +3,7 @@ import styles from "./ChipAccount.module.css";
 import { useUser } from "@alchemy/aa-alchemy/react";
 import { useEffect, useMemo, useState } from "react";
 import { getEnsAvatar, getEnsName } from "@wagmi/core";
-import { getConfig } from "@/wagmi";
+import { getEnsConfig } from "@/wagmi";
 import { normalize } from "viem/ens";
 
 const ChipAccount: React.FC = () => {
@@ -15,7 +15,7 @@ const ChipAccount: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const config = getConfig();
+      const config = getEnsConfig();
       if (user) {
         const name = await getEnsName(config, {
           address: user.address,
@@ -28,7 +28,7 @@ const ChipAccount: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const config = getConfig();
+      const config = getEnsConfig();
       if (ensName) {
         const avatar = await getEnsAvatar(config, {
           name: normalize(ensName),

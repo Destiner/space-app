@@ -1,17 +1,26 @@
 import { http, cookieStorage, createConfig, createStorage } from "wagmi";
-import { sepolia } from "wagmi/chains";
+import { baseSepolia, sepolia } from "wagmi/chains";
 import { coinbaseWallet } from "wagmi/connectors";
+
+export function getEnsConfig() {
+  return createConfig({
+    chains: [sepolia],
+    transports: {
+      [sepolia.id]: http(),
+    },
+  });
+}
 
 export function getConfig() {
   return createConfig({
-    chains: [sepolia],
+    chains: [baseSepolia],
     connectors: [coinbaseWallet()],
     storage: createStorage({
       storage: cookieStorage,
     }),
     ssr: true,
     transports: {
-      [sepolia.id]: http(),
+      [baseSepolia.id]: http(),
     },
   });
 }

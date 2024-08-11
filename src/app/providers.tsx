@@ -1,7 +1,7 @@
 "use client";
 
 import { QueryClient } from "@tanstack/react-query";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import { config } from "@/alchemy";
 import {
