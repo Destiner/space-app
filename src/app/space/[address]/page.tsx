@@ -4,7 +4,6 @@ import React, { useState, useEffect, useMemo } from "react";
 import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 import { useQuery } from "@tanstack/react-query";
 import request from "graphql-request";
-import * as Avatar from "@radix-ui/react-avatar";
 import {
   Address,
   encodeFunctionData,
@@ -27,7 +26,6 @@ import {
   useSendUserOperation,
   useSignerStatus,
   useSmartAccountClient,
-  useUser,
 } from "@alchemy/aa-alchemy/react";
 import { getConfig } from "@/wagmi";
 import ReorderableItemList from "@/components/space/ReorderableList";
@@ -71,7 +69,6 @@ type Props = {
 
 const Space: React.FC<Props> = ({ params }: Props) => {
   const { address } = params;
-  const user = useUser();
   const { address: accountAddress } = useAccount({
     type: accountType,
   });
@@ -345,81 +342,82 @@ const Space: React.FC<Props> = ({ params }: Props) => {
   return (
     <div className={styles.page}>
       <div className={styles.content}>
-        <h1>Space</h1>
         <div className={styles.view}>
-          <div className={styles.name}>
-            {nameRequest.data && !nameEditorVisible && (
-              <div>{nameRequest.data}</div>
-            )}
-            {isOwner && (
-              <div className={styles.nameEditor}>
-                {nameEditorVisible ? (
-                  <>
-                    <input
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Your name"
-                    />
-                    <div className={styles.buttons}>
-                      <button className="button" onClick={saveName}>
-                        Save
-                      </button>
-                      <button
-                        className="button"
-                        onClick={() => handleCancelNameClick()}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <button
-                    className="button"
-                    disabled={!isConnected || isSendingUserOperation}
-                    onClick={() => setNameEditorVisible(true)}
-                  >
-                    {nameRequest.data ? "Edit" : "Add name"}
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-          <div className={styles.bio}>
-            {bioRequest.data && !bioEditorVisible && (
-              <div>{bioRequest.data}</div>
-            )}
-            {isOwner && (
-              <div className={styles.bioEditor}>
-                {bioEditorVisible ? (
-                  <>
-                    <input
-                      value={bio}
-                      onChange={(e) => setBio(e.target.value)}
-                      placeholder="Your bio"
-                    />
-                    <div className={styles.buttons}>
-                      <button className="button" onClick={saveBio}>
-                        Save
-                      </button>
-                      <button
-                        className="button"
-                        onClick={() => handleCancelBioClick()}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <button
-                    className="button"
-                    disabled={!isConnected || isSendingUserOperation}
-                    onClick={() => setBioEditorVisible(true)}
-                  >
-                    {bioRequest.data ? "Edit" : "Add bio"}
-                  </button>
-                )}
-              </div>
-            )}
+          <div className={styles.personal}>
+            <div className={styles.name}>
+              {nameRequest.data && !nameEditorVisible && (
+                <div>{nameRequest.data}</div>
+              )}
+              {isOwner && (
+                <div className={styles.nameEditor}>
+                  {nameEditorVisible ? (
+                    <>
+                      <input
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Your name"
+                      />
+                      <div className={styles.buttons}>
+                        <button className={styles.button} onClick={saveName}>
+                          Save
+                        </button>
+                        <button
+                          className={styles.button}
+                          onClick={() => handleCancelNameClick()}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <button
+                      className={styles.button}
+                      disabled={!isConnected || isSendingUserOperation}
+                      onClick={() => setNameEditorVisible(true)}
+                    >
+                      {nameRequest.data ? "Edit" : "Add name"}
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className={styles.bio}>
+              {bioRequest.data && !bioEditorVisible && (
+                <div>{bioRequest.data}</div>
+              )}
+              {isOwner && (
+                <div className={styles.bioEditor}>
+                  {bioEditorVisible ? (
+                    <>
+                      <input
+                        value={bio}
+                        onChange={(e) => setBio(e.target.value)}
+                        placeholder="Your bio"
+                      />
+                      <div className={styles.buttons}>
+                        <button className={styles.button} onClick={saveBio}>
+                          Save
+                        </button>
+                        <button
+                          className={styles.button}
+                          onClick={() => handleCancelBioClick()}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <button
+                      className={styles.button}
+                      disabled={!isConnected || isSendingUserOperation}
+                      onClick={() => setBioEditorVisible(true)}
+                    >
+                      {bioRequest.data ? "Edit" : "Add bio"}
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
           {accountAddress && !isOwner && (
             <div>
@@ -463,13 +461,13 @@ const Space: React.FC<Props> = ({ params }: Props) => {
                       <div className={styles.buttons}>
                         <button
                           disabled={isSendingUserOperation}
-                          className={styles.large}
+                          className={`${styles.button} ${styles.ghost} ${styles.large}`}
                           onClick={() => handleSaveClick()}
                         >
                           Save
                         </button>
                         <button
-                          className={`button ${styles.large}`}
+                          className={`${styles.button} ${styles.ghost} ${styles.large}`}
                           onClick={() => handleCancelClick()}
                         >
                           Cancel
@@ -478,7 +476,7 @@ const Space: React.FC<Props> = ({ params }: Props) => {
                     </>
                   ) : (
                     <button
-                      className={`button ${styles.large}`}
+                      className={`${styles.button} ${styles.ghost} ${styles.large}`}
                       onClick={() => setFormVisible(true)}
                     >
                       Add

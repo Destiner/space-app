@@ -1,7 +1,7 @@
 .page {
   display: flex;
   justify-content: center;
-  margin-top: 30px;
+  margin-top: 128px;
   padding: 16px;
 }
 
@@ -51,10 +51,18 @@
 }
 
 .button {
+  font-weight: normal;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.ghost {
   padding: 0;
   border: none;
   background: none;
-  cursor: pointer;
 }
 
 .small {
@@ -96,10 +104,25 @@
   }
 }
 
+.personal {
+  display: flex;
+  gap: 4px;
+  flex-direction: column;
+}
+
 .name,
 .bio {
   display: flex;
   justify-content: space-between;
+}
+
+.name {
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.bio {
+  color: #666;
 }
 
 .name-editor,
