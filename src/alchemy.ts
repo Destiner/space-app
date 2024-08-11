@@ -11,6 +11,9 @@ import { QueryClient } from "@tanstack/react-query";
 export const chain = baseSepolia;
 export const config = createConfig({
   rpcUrl: "/api/rpc/chain/" + chain.id,
+  sessionConfig: {
+    expirationTimeMs: 60 * 60 * 1000,
+  },
   signerConnection: {
     rpcUrl: "/api/rpc/",
   },
