@@ -79,6 +79,8 @@ const Space: React.FC<Props> = ({ params }: Props) => {
 
   const [formVisible, setFormVisible] = useState(false);
   const [item, setItem] = useState<Item | undefined>(undefined);
+  const [nameEditorVisible, setNameEditorVisible] = useState(false);
+  const [name, setName] = useState("");
   const [bioEditorVisible, setBioEditorVisible] = useState(false);
   const [bio, setBio] = useState("");
 
@@ -101,6 +103,17 @@ const Space: React.FC<Props> = ({ params }: Props) => {
         abi: spaceAbi,
         address: address as Address,
         functionName: "owner",
+        args: [],
+      });
+    },
+  });
+  const nameRequest = useQuery({
+    queryKey: ["name", address],
+    queryFn: async () => {
+      return await readContract(getConfig(), {
+        abi: spaceAbi,
+        address: address as Address,
+        functionName: "name",
         args: [],
       });
     },
@@ -171,6 +184,7 @@ const Space: React.FC<Props> = ({ params }: Props) => {
   useEffect(() => {
     if (sendUserOperationResult) {
       linksRequest.refetch();
+      nameRequest.refetch();
       bioRequest.refetch();
     }
   });
@@ -207,6 +221,10 @@ const Space: React.FC<Props> = ({ params }: Props) => {
   useEffect(() => {
     setBio(bioRequest.data || "");
   }, [bioRequest.data]);
+
+  useEffect(() => {
+    setName(nameRequest.data || "");
+  }, [nameRequest.data]);
 
   const removeItem = (index: number) => {
     if (!linksRequest.data || !address) return;
@@ -272,6 +290,21 @@ const Space: React.FC<Props> = ({ params }: Props) => {
     });
   };
 
+  const saveName = () => {
+    if (!address) return;
+    sendUserOperation({
+      uo: {
+        target: address as Address,
+        data: encodeFunctionData({
+          abi: spaceAbi,
+          functionName: "setName",
+          args: [name],
+        }),
+      },
+    });
+    setNameEditorVisible(false);
+  };
+
   const saveBio = () => {
     if (!address) return;
     sendUserOperation({
@@ -286,6 +319,16 @@ const Space: React.FC<Props> = ({ params }: Props) => {
     });
     setBioEditorVisible(false);
   };
+
+  function handleCancelNameClick() {
+    setNameEditorVisible(false);
+    setName(nameRequest.data || "");
+  }
+
+  function handleCancelBioClick() {
+    setBioEditorVisible(false);
+    setBio(bioRequest.data || "");
+  }
 
   function handleCancelClick() {
     setFormVisible(false);
@@ -352,6 +395,43 @@ const Space: React.FC<Props> = ({ params }: Props) => {
               {ensName && <div className={styles.name}>{ensName}</div>}
             </div>
           )}
+          <div className={styles.name}>
+            {nameRequest.data && !nameEditorVisible && (
+              <div>{nameRequest.data}</div>
+            )}
+            {isOwner && (
+              <div className={styles.nameEditor}>
+                {nameEditorVisible ? (
+                  <>
+                    <input
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Your name"
+                    />
+                    <div className={styles.buttons}>
+                      <button className="button" onClick={saveName}>
+                        Save
+                      </button>
+                      <button
+                        className="button"
+                        onClick={() => handleCancelNameClick()}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <button
+                    className="button"
+                    disabled={!isConnected || isSendingUserOperation}
+                    onClick={() => setNameEditorVisible(true)}
+                  >
+                    {nameRequest.data ? "Edit" : "Add name"}
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
           <div className={styles.bio}>
             {bioRequest.data && !bioEditorVisible && (
               <div>{bioRequest.data}</div>
@@ -371,7 +451,7 @@ const Space: React.FC<Props> = ({ params }: Props) => {
                       </button>
                       <button
                         className="button"
-                        onClick={() => setBioEditorVisible(false)}
+                        onClick={() => handleCancelBioClick()}
                       >
                         Cancel
                       </button>
