@@ -5,7 +5,7 @@ import { Address, decodeEventLog, encodeFunctionData, Hex } from "viem";
 import { getTransactionReceipt } from "@wagmi/core";
 import { useRouter } from "next/navigation";
 import spaceFactoryAbi from "@/abi/spaceFactory";
-import { Item } from "@/components/new/ItemEditor";
+import { Item } from "@/components/__common/ItemEditor";
 import ItemListEditor from "@/components/new/ItemListEditor";
 import styles from "./page.module.css";
 import {
@@ -16,7 +16,7 @@ import {
 import { accountType, gasManagerConfig } from "@/alchemy";
 import { getConfig } from "@/wagmi";
 
-const SPACE_FACTORY_ADDRESS = "0x497d9a170b4decf47338d925930d39f87e0e6a5b";
+const SPACE_FACTORY_ADDRESS = "0xe5b7b6a1d0c06ba234be71e643c92535bc8d4f6d";
 
 const CreateSpace: React.FC = () => {
   const router = useRouter();

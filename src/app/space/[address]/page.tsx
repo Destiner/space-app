@@ -16,7 +16,7 @@ import {
 
 import easAbi from "@/abi/eas";
 import spaceAbi from "@/abi/space";
-import ItemEditor, { type Item } from "@/components/new/ItemEditor";
+import ItemEditor, { type Item } from "@/components/__common/ItemEditor";
 import { graphql } from "@/gql/gql";
 import { accountType, gasManagerConfig } from "@/alchemy";
 
@@ -31,6 +31,7 @@ import {
   useUser,
 } from "@alchemy/aa-alchemy/react";
 import { getConfig, getEnsConfig } from "@/wagmi";
+import ReorderableItemList from "@/components/space/ReorderableList";
 
 const easContractAddress = "0x4200000000000000000000000000000000000021";
 const schemaUID =
@@ -87,6 +88,12 @@ const Space: React.FC<Props> = ({ params }: Props) => {
     gasManagerConfig,
   });
 
+  const getLinkId = (link: { value: string; label: string }): bigint => {
+    return BigInt(
+      keccak256(encodePacked(["string", "string"], [link.label, link.value]))
+    );
+  };
+
   const ownerRequest = useQuery({
     queryKey: ["owner", address],
     queryFn: async () => {
@@ -120,6 +127,16 @@ const Space: React.FC<Props> = ({ params }: Props) => {
       });
     },
   });
+  const linkItems = useMemo<Item[]>(() => {
+    if (linksRequest.data) {
+      return linksRequest.data.map((link) => ({
+        label: link.label,
+        value: link.value,
+        id: parseInt(getLinkId(link).toString()),
+      }));
+    }
+    return [];
+  }, [linksRequest.data]);
 
   const { sendUserOperation, sendUserOperationResult, isSendingUserOperation } =
     useSendUserOperation({ client, waitForTxn: true });
@@ -224,12 +241,6 @@ const Space: React.FC<Props> = ({ params }: Props) => {
     setFormVisible(false);
   };
 
-  const getLinkId = (link: Item): bigint => {
-    return BigInt(
-      keccak256(encodePacked(["string", "string"], [link.label, link.value]))
-    );
-  };
-
   const endorse = () => {
     if (!address) return;
     const schemaEncoder = new SchemaEncoder("string reason");
@@ -284,6 +295,38 @@ const Space: React.FC<Props> = ({ params }: Props) => {
   function handleSaveClick() {
     addItem();
     setItem(undefined);
+  }
+
+  function handleItemsChange(items: Item[], dragItem: Item, hoverItem: Item) {
+    // Get the item that was moved
+    const movedItem = dragItem;
+    const oldIndex = linkItems.findIndex((item) => item.id === movedItem.id);
+    // Get the old preceding (prev) item
+    const oldPrevItem = oldIndex > 0 ? linkItems[oldIndex - 1] : undefined;
+    const oldPrevItemId = oldPrevItem ? getLinkId(oldPrevItem) : 0n;
+    // Get the new preceding (prev) item
+    const hoverItemIndex = linkItems.findIndex(
+      (item) => item.id === hoverItem.id
+    );
+    const newPrevItem =
+      hoverItemIndex > 0 ? linkItems[hoverItemIndex - 1] : undefined;
+    const newPrevItemId = newPrevItem ? getLinkId(newPrevItem) : 0n;
+    // Call "reorderLink" with the old preceding item's ID and the new preceding item's ID
+    sendUserOperation({
+      uo: {
+        target: address as Address,
+        data: encodeFunctionData({
+          abi: spaceAbi,
+          functionName: "reorderLink",
+          args: [oldPrevItemId, newPrevItemId],
+        }),
+      },
+    });
+  }
+
+  function handleItemRemove(item: Item) {
+    const index = linkItems.findIndex((i) => i.id === item.id);
+    removeItem(index);
   }
 
   return (
@@ -346,7 +389,7 @@ const Space: React.FC<Props> = ({ params }: Props) => {
               </div>
             )}
           </div>
-          {!isOwner && (
+          {accountAddress && !isOwner && (
             <div>
               {!isEndorsed ? (
                 <button
@@ -363,22 +406,23 @@ const Space: React.FC<Props> = ({ params }: Props) => {
           )}
           {linksRequest.data && (
             <div className={styles.list}>
-              {linksRequest.data.map((link, index) => (
-                <div key={index} className={styles.item}>
-                  <div className={styles.link}>
-                    <div className={styles.label}>{link.label}</div>
-                    <div className={styles.value}>{link.value}</div>
+              {isOwner ? (
+                <ReorderableItemList
+                  items={linkItems}
+                  onItemsChange={handleItemsChange}
+                  onItemRemove={handleItemRemove}
+                  disabled={isSendingUserOperation}
+                />
+              ) : (
+                linksRequest.data.map((link, index) => (
+                  <div key={index} className={styles.item}>
+                    <div className={styles.link}>
+                      <div className={styles.label}>{link.label}</div>
+                      <div className={styles.value}>{link.value}</div>
+                    </div>
                   </div>
-                  {isOwner && (
-                    <button
-                      className={`button ${styles.small}`}
-                      onClick={() => removeItem(index)}
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
-              ))}
+                ))
+              )}
               {isOwner && (
                 <div>
                   {formVisible ? (

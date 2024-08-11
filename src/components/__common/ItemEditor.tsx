@@ -4,6 +4,7 @@ import styles from "./ItemEditor.module.css";
 interface Item {
   label: string;
   value: string;
+  id: number;
 }
 
 interface ItemEditor {
@@ -13,7 +14,7 @@ interface ItemEditor {
 
 const ItemEditor: React.FC<ItemEditor> = ({ initialItem, onChange }) => {
   const [item, setItem] = useState<Item>(
-    initialItem || { label: "", value: "" }
+    initialItem || { label: "", value: "", id: 0 }
   );
 
   const handleChange =

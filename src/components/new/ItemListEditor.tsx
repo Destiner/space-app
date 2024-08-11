@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ItemEditor, { Item } from "./ItemEditor";
+import ItemEditor, { Item } from "../__common/ItemEditor";
 import styles from "./ItemListEditor.module.css";
 
 interface ItemListEditorProps {
@@ -21,7 +21,7 @@ const ItemListEditor: React.FC<ItemListEditorProps> = ({
   };
 
   const addItem = (): void => {
-    const updatedModel = [...model, { label: "", value: "" }];
+    const updatedModel = [...model, { label: "", value: "", id: 0 }];
     setModel(updatedModel);
     onChange(updatedModel);
   };

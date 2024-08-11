@@ -91,6 +91,25 @@ const abi = [
   },
   {
     anonymous: false,
+    inputs: [],
+    name: "NewName",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+    ],
+    name: "NewOwner",
+    type: "event",
+  },
+  {
+    anonymous: false,
     inputs: [
       {
         indexed: true,
@@ -100,6 +119,31 @@ const abi = [
       },
     ],
     name: "RemoveLink",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "id",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "oldPrevId",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "newPrevId",
+        type: "uint256",
+      },
+    ],
+    name: "ReorderLink",
     type: "event",
   },
   {
@@ -176,6 +220,19 @@ const abi = [
   },
   {
     inputs: [],
+    name: "name",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "owner",
     outputs: [
       {
@@ -203,12 +260,43 @@ const abi = [
   {
     inputs: [
       {
+        internalType: "uint256",
+        name: "oldPrevId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "newPrevId",
+        type: "uint256",
+      },
+    ],
+    name: "reorderLink",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "string",
         name: "newBio",
         type: "string",
       },
     ],
     name: "setBio",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "string",
+        name: "newName",
+        type: "string",
+      },
+    ],
+    name: "setName",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

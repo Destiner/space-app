@@ -1,0 +1,57 @@
+.list {
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+}
+
+.list.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.card {
+  border: 1px dashed gray;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+  background-color: white;
+  cursor: move;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.link {
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.value {
+  font-size: 24px;
+}
+
+.button {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.small {
+  opacity: 0.6;
+  font-size: 14px;
+
+  &:hover {
+    color: black;
+  }
+}

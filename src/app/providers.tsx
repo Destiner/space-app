@@ -1,7 +1,9 @@
 "use client";
 
 import { QueryClient } from "@tanstack/react-query";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useState } from "react";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 import { config } from "@/alchemy";
 import {
@@ -16,12 +18,14 @@ export function Providers(props: {
   const [queryClient] = useState(() => new QueryClient());
 
   return (
-    <AlchemyAccountProvider
-      config={config}
-      queryClient={queryClient}
-      initialState={props.initialState}
-    >
-      {props.children}
-    </AlchemyAccountProvider>
+    <DndProvider backend={HTML5Backend}>
+      <AlchemyAccountProvider
+        config={config}
+        queryClient={queryClient}
+        initialState={props.initialState}
+      >
+        {props.children}
+      </AlchemyAccountProvider>
+    </DndProvider>
   );
 }
