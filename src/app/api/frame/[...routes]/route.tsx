@@ -9,7 +9,7 @@ const app = new Frog({
   title: "Frog Frame",
 });
 
-app.frame("/space/:address", (c) => {
+app.frame("/space", (c) => {
   const { buttonValue, status } = c;
   return c.res({
     image: (
