@@ -54,7 +54,14 @@ app.frame("/space/:address", async (c) => {
   ) {
     return c.res({
       image: (
-        <div style={{ color: "white", display: "flex", fontSize: 60 }}>
+        <div
+          style={{
+            color: "white",
+            display: "flex",
+            flexDirection: "column",
+            fontSize: 60,
+          }}
+        >
           Unable to fetch the space
         </div>
       ),
@@ -69,10 +76,23 @@ app.frame("/space/:address", async (c) => {
 
   return c.res({
     image: (
-      <div style={{ color: "white", display: "flex", fontSize: 60 }}>
-        <div style={{ display: "flex", fontSize: 60 }}>{name}</div>
-        <div style={{ display: "flex", fontSize: 60 }}>{bio}</div>
-        <div style={{ display: "flex", fontSize: 60 }}>{links}</div>
+      <div
+        style={{
+          color: "white",
+          display: "flex",
+          flexDirection: "column",
+          fontSize: 60,
+        }}
+      >
+        <div style={{ display: "flex", flexDirection: "column", fontSize: 60 }}>
+          {name}
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", fontSize: 60 }}>
+          {bio}
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", fontSize: 60 }}>
+          {links}
+        </div>
       </div>
     ),
     intents: [
