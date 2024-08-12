@@ -3,7 +3,7 @@ import { Button, Frog } from "frog";
 import { handle } from "frog/next";
 import { devtools } from "frog/dev";
 import { serveStatic } from "frog/serve-static";
-import { readContract, multicall } from "@wagmi/core";
+import { multicall } from "@wagmi/core";
 
 import spaceAbi from "@/abi/space";
 import { getConfig } from "@/wagmi";
@@ -15,12 +15,10 @@ const app = new Frog({
   title: "Frog Frame",
 });
 
-// export const runtime = "edge";
-
 app.frame("/space/:address", async (c) => {
-  const { buttonValue, status } = c;
-
+  console.log("space 1");
   const spaceAddress = c.req.param("address") as Address;
+  console.log("space 2");
 
   const result = await multicall(getConfig(), {
     contracts: [
@@ -42,10 +40,12 @@ app.frame("/space/:address", async (c) => {
       },
     ],
   });
+  console.log("space 3");
 
   const nameResult = result[0];
   const bioResult = result[1];
   const linksResult = result[2];
+  console.log("space 4");
 
   if (
     nameResult.status === "failure" ||
@@ -60,10 +60,12 @@ app.frame("/space/:address", async (c) => {
       ),
     });
   }
+  console.log("space 5");
 
   const name = nameResult.result;
   const bio = bioResult.result;
   const links = linksResult.result;
+  console.log("space 6");
 
   return c.res({
     image: (
