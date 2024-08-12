@@ -3,8 +3,6 @@ import { Button, Frog } from "frog";
 import { handle } from "frog/next";
 import { createSystem } from "frog/ui";
 
-const urlFont = await fetch("https://...").then((res) => res.arrayBuffer());
-
 const { Box, Heading, Text, VStack } = createSystem();
 
 const app = new Frog({
