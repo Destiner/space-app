@@ -51,7 +51,11 @@ app.frame("/space/:address", async (c) => {
     linksResult.status === "failure"
   ) {
     return c.res({
-      image: <div>Unable to fetch the space</div>,
+      image: (
+        <div style="display:flex;flex-direction:column;color:white;font-size:60px;padding:20px;background:black;width:100%;height:100%;">
+          Unable to fetch the space
+        </div>
+      ),
     });
   }
   console.log("space 5");
@@ -63,9 +67,9 @@ app.frame("/space/:address", async (c) => {
 
   return c.res({
     image: (
-      <div>
-        <div>{name}</div>
-        <div>{bio}</div>
+      <div style="display:flex;flex-direction:column;color:white;font-size:60px;padding:20px;background:black;width:100%;height:100%;">
+        <div style="margin-bottom:20px;">{name}</div>
+        <div style="margin-bottom:20px;">{bio}</div>
         <div>{links}</div>
       </div>
     ),
