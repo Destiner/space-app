@@ -53,18 +53,7 @@ app.frame("/space/:address", async (c) => {
     linksResult.status === "failure"
   ) {
     return c.res({
-      image: (
-        <div
-          style={{
-            color: "white",
-            display: "flex",
-            flexDirection: "column",
-            fontSize: 60,
-          }}
-        >
-          Unable to fetch the space
-        </div>
-      ),
+      image: <div>Unable to fetch the space</div>,
     });
   }
   console.log("space 5");
@@ -76,23 +65,10 @@ app.frame("/space/:address", async (c) => {
 
   return c.res({
     image: (
-      <div
-        style={{
-          color: "white",
-          display: "flex",
-          flexDirection: "column",
-          fontSize: 60,
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "column", fontSize: 60 }}>
-          {name}
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", fontSize: 60 }}>
-          {bio}
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", fontSize: 60 }}>
-          {links}
-        </div>
+      <div>
+        <div>{name}</div>
+        <div>{bio}</div>
+        <div>{links}</div>
       </div>
     ),
     intents: [
