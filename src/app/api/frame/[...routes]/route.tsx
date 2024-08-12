@@ -81,7 +81,7 @@ app.frame("/space/:address", async (c) => {
   const name = nameResult.result;
   const bio = bioResult.result;
   const links = linksResult.result;
-  console.log("space", name, bio, links);
+  const topLinks = links.slice(0, 4);
 
   return c.res({
     image: (
@@ -101,11 +101,7 @@ app.frame("/space/:address", async (c) => {
     ),
     intents: [
       // eslint-disable-next-line react/jsx-key
-      <Button value="apple">Apple</Button>,
-      // eslint-disable-next-line react/jsx-key
-      <Button value="banana">Banana</Button>,
-      // eslint-disable-next-line react/jsx-key
-      <Button value="mango">Mango</Button>,
+      <Button.Link href="https://google.com">Google</Button.Link>,
     ],
   });
 });
