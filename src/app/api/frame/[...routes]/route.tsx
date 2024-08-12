@@ -9,10 +9,15 @@ import { Address } from "viem";
 
 const app = new Frog({
   basePath: "/api/frame",
-  browserLocation: "/:path",
+  // browserLocation: "/:path",
   title: "Frog Frame",
 });
 
+app.frame("/", async (c) => {
+  return c.res({
+    image: <div>Home</div>,
+  });
+});
 app.frame("/space/:address", async (c) => {
   const spaceAddress = c.req.param("address") as Address;
 
@@ -68,7 +73,14 @@ app.frame("/space/:address", async (c) => {
         <div>{links}</div>
       </div>
     ),
-    intents: [],
+    intents: [
+      // eslint-disable-next-line react/jsx-key
+      <Button value="apple">Apple</Button>,
+      // eslint-disable-next-line react/jsx-key
+      <Button value="banana">Banana</Button>,
+      // eslint-disable-next-line react/jsx-key
+      <Button value="mango">Mango</Button>,
+    ],
   });
 });
 
