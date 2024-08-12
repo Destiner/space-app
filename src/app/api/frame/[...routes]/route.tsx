@@ -69,11 +69,8 @@ app.frame("/space/:address", async (c) => {
       </div>
     ),
     intents: [
-      // eslint-disable-next-line react/jsx-key
       <Button value="apple">Apple</Button>,
-      // eslint-disable-next-line react/jsx-key
       <Button value="banana">Banana</Button>,
-      // eslint-disable-next-line react/jsx-key
       <Button value="mango">Mango</Button>,
     ],
   });
