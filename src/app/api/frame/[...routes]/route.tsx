@@ -92,8 +92,6 @@ app.frame("/space/:address", async (c) => {
   const links = linksResult.result;
   const topLinks = links.filter((link) => isValidUrl(link.value)).slice(0, 4);
 
-  console.log(topLinks);
-
   return c.res({
     image: (
       <div

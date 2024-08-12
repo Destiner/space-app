@@ -81,7 +81,6 @@ const Search: React.FC = () => {
   const [bioResults, setBioResults] = useState([]);
 
   useEffect(() => {
-    console.log(searchRequest.data);
     if (searchRequest.data) {
       setLinkResults(searchRequest.data.link_search || []);
       setNameResults(searchRequest.data.name_search || []);
