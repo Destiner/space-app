@@ -1,8 +1,6 @@
 /** @jsxImportSource frog/jsx */
 import { Button, Frog } from "frog";
 import { handle } from "frog/next";
-import { devtools } from "frog/dev";
-import { serveStatic } from "frog/serve-static";
 import { multicall } from "@wagmi/core";
 
 import spaceAbi from "@/abi/space";
@@ -61,7 +59,7 @@ app.frame("/space/:address", async (c) => {
   const name = nameResult.result;
   const bio = bioResult.result;
   const links = linksResult.result;
-  console.log("space 6");
+  console.log("space 6", name, bio, links);
 
   return c.res({
     image: (
@@ -81,8 +79,6 @@ app.frame("/space/:address", async (c) => {
     ],
   });
 });
-
-devtools(app, { serveStatic });
 
 export const GET = handle(app);
 export const POST = handle(app);
