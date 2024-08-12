@@ -38,3 +38,4 @@ next-env.d.ts
 # subgraph
 /subgraph/generated
 /subgraph/build
+/subgraph/node_modules

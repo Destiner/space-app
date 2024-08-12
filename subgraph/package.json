@@ -1,0 +1,13 @@
+{
+  "name": "space-app-subgraph",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "subgraph:codegen": "graph codegen",
+    "subgraph:build": "graph build"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "^0.80.0",
+    "@graphprotocol/graph-ts": "^0.35.1"
+  }
+}
