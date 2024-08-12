@@ -100,7 +100,7 @@ app.frame("/space/:address", async (c) => {
         }}
       >
         <div style={{ fontSize: 80, color: "#fafafa" }}>{name}</div>
-        <div style={{ fontSize: 55, color: "#e3e3e3" }}>{bio}</div>
+        <div style={{ fontSize: 50, color: "#e3e3e3" }}>{bio}</div>
       </div>
     ),
     intents: [
