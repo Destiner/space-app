@@ -68,11 +68,7 @@ app.frame("/space/:address", async (c) => {
         <div>{links}</div>
       </div>
     ),
-    intents: [
-      <Button value="apple">Apple</Button>,
-      <Button value="banana">Banana</Button>,
-      <Button value="mango">Mango</Button>,
-    ],
+    intents: [],
   });
 });
 
