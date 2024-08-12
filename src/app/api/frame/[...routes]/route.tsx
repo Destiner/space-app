@@ -91,11 +91,6 @@ app.frame("/space/:address", async (c) => {
   const bio = bioResult.result;
   const links = linksResult.result;
   const topLinks = links.filter((link) => isValidUrl(link.value)).slice(0, 4);
-  // const linkA = links[0];
-  // const linkB = links[1];
-  // const linkC = links[2];
-  // const linkD = links[3];
-  // const linkInvalid = links[10];
 
   console.log(topLinks);
 
@@ -118,15 +113,6 @@ app.frame("/space/:address", async (c) => {
       </div>
     ),
     intents: [
-      // // eslint-disable-next-line react/jsx-key
-      // <Button.Link href={linkA.value}>{linkA.label}</Button.Link>,
-      // // eslint-disable-next-line react/jsx-key
-      // <Button.Link href={linkB.value}>{linkB.label}</Button.Link>,
-      // // eslint-disable-next-line react/jsx-key
-      // <Button.Link href={linkC.value}>{linkC.label}</Button.Link>,
-      // // eslint-disable-next-line react/jsx-key
-      // <Button.Link href={linkD.value}>{linkD.label}</Button.Link>,
-      // <Button.Link href={linkInvalid.value}>{linkInvalid.label}</Button.Link>
       ...topLinks.map((link) => (
         // eslint-disable-next-line react/jsx-key
         <Button.Link href={link.value}>{link.label}</Button.Link>
