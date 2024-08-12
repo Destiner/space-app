@@ -52,7 +52,36 @@ app.frame("/space/:address", async (c) => {
     ],
   });
 
-  const { buttonValue, status } = c;
+  const nameResult = result[0];
+  const bioResult = result[1];
+  const linksResult = result[2];
+
+  if (
+    nameResult.status === "failure" ||
+    bioResult.status === "failure" ||
+    linksResult.status === "failure"
+  ) {
+    return c.res({
+      image: (
+        <div
+          style={{
+            background: "black",
+            color: "white",
+            display: "flex",
+            fontSize: 60,
+          }}
+        >
+          {"Unable to fetch space"}
+        </div>
+      ),
+    });
+  }
+
+  const name = nameResult.result;
+  const bio = bioResult.result;
+  const links = linksResult.result;
+  console.log("space", name, bio, links);
+
   return c.res({
     image: (
       <div
@@ -63,9 +92,7 @@ app.frame("/space/:address", async (c) => {
           fontSize: 60,
         }}
       >
-        {status === "initial"
-          ? "Select your fruit!"
-          : `Selected: ${buttonValue}`}
+        {name}
       </div>
     ),
     intents: [
