@@ -21,13 +21,15 @@ const Space: React.FC<Props> = ({ params }: Props) => {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const address = params.address;
   console.log("address", address);
-  const url = process.env.VERCEL_URL || "http://localhost:3000";
+  const url = `https://${process.env.VERCEL_URL}` || "http://localhost:3000";
   console.log("url", url);
   const frameMetadata = await getFrameMetadata(
     `${url}/api/frame/space/${address}`
   );
   console.log("frameMetadata", frameMetadata);
-  const text = await fetch(url).then((r) => r.text());
+  const text = await fetch(`${url}/api/frame/space/${address}`).then((r) =>
+    r.text()
+  );
   console.log("text", text);
   return {
     other: frameMetadata,
