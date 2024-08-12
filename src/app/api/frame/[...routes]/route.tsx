@@ -91,6 +91,7 @@ app.frame("/space/:address", async (c) => {
           color: "white",
           display: "flex",
           alignItems: "center",
+          justifyContent: "center",
           flexDirection: "column",
           gap: "16px",
           height: "100%",
@@ -101,8 +102,12 @@ app.frame("/space/:address", async (c) => {
       </div>
     ),
     intents: [
-      // eslint-disable-next-line react/jsx-key
-      <Button.Link href="https://google.com">Google</Button.Link>,
+      topLinks.map((link, index) => (
+        // @ts-ignore
+        <Button.Link key={index} href={link.value}>
+          {link.label}
+        </Button.Link>
+      )),
     ],
   });
 });
