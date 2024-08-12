@@ -8,6 +8,8 @@ const AppHeader: React.FC = () => {
     <header className={style.header}>
       <div className={style.side}>
         <a href="/">Home</a>
+        <a href="/search">Search</a>
+        <a href="/new">Create</a>
       </div>
       <div className={style.side}>
         <ButtonWallet />
