@@ -102,11 +102,9 @@ app.frame("/space/:address", async (c) => {
       </div>
     ),
     intents: [
-      topLinks.map((link, index) => (
-        // @ts-ignore
-        <Button.Link key={index} href={link.value}>
-          {link.label}
-        </Button.Link>
+      topLinks.map((link) => (
+        // eslint-disable-next-line react/jsx-key
+        <Button.Link href={link.value}>{link.label}</Button.Link>
       )),
     ],
   });
