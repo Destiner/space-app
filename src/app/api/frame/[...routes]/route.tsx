@@ -9,6 +9,8 @@ const app = new Frog({
   title: "Frog Frame",
 });
 
+export const runtime = "edge";
+
 app.frame("/space", (c) => {
   const { buttonValue, status } = c;
   return c.res({
