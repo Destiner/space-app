@@ -25,6 +25,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     `${url}/api/frame/space/${address}`
   );
   console.log("frameMetadata", frameMetadata);
+  const text = await fetch(url).then((r) => r.text());
+  console.log("text", text);
   return {
     other: frameMetadata,
   };
