@@ -1,8 +1,9 @@
-import { getFrameMetadata } from "frog/next";
+import { getFrameMetadata, isFrameRequest } from "frog/next";
 import type { Metadata } from "next";
 import React from "react";
 
 import SpaceView from "@/components/space/SpaceView";
+import { headers } from "next/headers";
 
 type Props = {
   params: {
@@ -13,6 +14,7 @@ type Props = {
 const Space: React.FC<Props> = ({ params }: Props) => {
   const { address } = params;
 
+  if (isFrameRequest(headers())) return null;
   return <SpaceView address={address} />;
 };
 
