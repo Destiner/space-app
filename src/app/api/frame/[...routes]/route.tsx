@@ -70,9 +70,9 @@ app.frame("/space/:address", async (c) => {
   return c.res({
     image: (
       <div style={{ color: "white", display: "flex", fontSize: 60 }}>
-        <div>{name}</div>
-        <div>{bio}</div>
-        <div>{links}</div>
+        <div style={{ display: "flex", fontSize: 60 }}>{name}</div>
+        <div style={{ display: "flex", fontSize: 60 }}>{bio}</div>
+        <div style={{ display: "flex", fontSize: 60 }}>{links}</div>
       </div>
     ),
     intents: [
