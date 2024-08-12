@@ -1,5 +1,3 @@
-"use client";
-
 import { getFrameMetadata } from "frog/next";
 import type { Metadata } from "next";
 import React from "react";
