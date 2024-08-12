@@ -2,6 +2,7 @@
 import { Button, Frog } from "frog";
 import { handle } from "frog/next";
 import { createSystem } from "frog/ui";
+import { Address } from "viem";
 
 const { Box, Heading, Text, VStack } = createSystem();
 
@@ -26,7 +27,9 @@ const app = new Frog({
 
 export const runtime = "edge";
 
-app.frame("/space", (c) => {
+app.frame("/space/:address", (c) => {
+  const spaceAddress = c.req.param("address") as Address;
+
   const { buttonValue, status } = c;
   return c.res({
     image: (
