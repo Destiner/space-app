@@ -1,8 +1,9 @@
 /** @jsxImportSource frog/jsx */
-import { Button, Frog, TextInput } from "frog";
+import { Button, Frog } from "frog";
 import { handle } from "frog/next";
+import { createSystem } from "frog/ui";
 
-import { Box, Heading, Text, VStack, vars } from "../ui.js";
+const { Box, Heading, Text, VStack } = createSystem();
 
 const app = new Frog({
   basePath: "/api/frame",
