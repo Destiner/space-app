@@ -28,6 +28,15 @@ const app = new Frog({
 
 export const runtime = "edge";
 
+function isValidUrl(input: string): boolean {
+  try {
+    new URL(input);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 app.frame("/space/:address", async (c) => {
   const spaceAddress = c.req.param("address") as Address;
 
@@ -81,7 +90,7 @@ app.frame("/space/:address", async (c) => {
   const name = nameResult.result;
   const bio = bioResult.result;
   const links = linksResult.result;
-  const topLinks = links.slice(0, 4);
+  const topLinks = links.filter((link) => isValidUrl(link.value)).slice(0, 4);
   // const linkA = links[0];
   // const linkB = links[1];
   // const linkC = links[2];
