@@ -1,0 +1,14 @@
+type Link @entity {
+  id: ID!
+  value: String!
+  label: String!
+  space: Space!
+}
+
+type Space @entity {
+  id: ID!
+  owner: String!
+  name: String
+  bio: String
+  links: [Link!]! @derivedFrom(field: "space")
+}

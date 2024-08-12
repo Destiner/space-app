@@ -1,0 +1,55 @@
+specVersion: 0.0.4
+description: POAP
+repository: https://github.com/Destiner/space-app
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: SpaceFactory
+    network: base-sepolia
+    source:
+      address: "0xe5b7b6a1d0c06ba234be71e643c92535bc8d4f6d"
+      abi: SpaceFactory
+      startBlock: 13813773
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Space
+      abis:
+        - name: SpaceFactory
+          file: ./abis/factory.json
+      eventHandlers:
+        - event: CreateSpace(address)
+          handler: handleCreateSpace
+      file: ./src/factory.ts
+templates:
+  - name: Space
+    kind: ethereum/contract
+    network: base-sepolia
+    source:
+      abi: Space
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/space.ts
+      entities:
+        - Space
+      abis:
+        - name: Space
+          file: ./abis/space.json
+      eventHandlers:
+        - event: AddLink(indexed uint256,uint256,string,string)
+          handler: handleAddLink
+        - event: NewBio()
+          handler: handleNewBio
+        - event: NewName()
+          handler: handleNewName
+        - event: NewOwner(indexed address)
+          handler: handleNewOwner
+        - event: RemoveLink(indexed uint256)
+          handler: handleRemoveLink
+        # - event: ReorderLink(indexed uint256,uint256,uint256)
+        # handler: handleReorderLink
