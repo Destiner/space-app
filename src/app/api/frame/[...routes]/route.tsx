@@ -9,7 +9,6 @@ import spaceAbi from "@/abi/space";
 
 const app = new Frog({
   basePath: "/api/frame",
-  browserLocation: "/:path",
   title: "Frog Frame",
   imageOptions: {
     fonts: [
