@@ -2,7 +2,6 @@
 import { getConfig } from "@/wagmi";
 import { Button, Frog } from "frog";
 import { handle } from "frog/next";
-import { createSystem } from "frog/ui";
 import { Address } from "viem";
 import { multicall } from "wagmi/actions";
 
