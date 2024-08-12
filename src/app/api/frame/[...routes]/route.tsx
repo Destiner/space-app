@@ -8,8 +8,6 @@ import { multicall } from "wagmi/actions";
 
 import spaceAbi from "@/abi/space";
 
-const { Box, Heading, Text, VStack } = createSystem();
-
 const app = new Frog({
   basePath: "/api/frame",
   title: "Frog Frame",
@@ -58,7 +56,14 @@ app.frame("/space/:address", async (c) => {
   const { buttonValue, status } = c;
   return c.res({
     image: (
-      <div style={{ color: "white", display: "flex", fontSize: 60 }}>
+      <div
+        style={{
+          background: "black",
+          color: "white",
+          display: "flex",
+          fontSize: 60,
+        }}
+      >
         {status === "initial"
           ? "Select your fruit!"
           : `Selected: ${buttonValue}`}
