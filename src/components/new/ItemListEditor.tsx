@@ -21,7 +21,7 @@ const ItemListEditor: React.FC<ItemListEditorProps> = ({
   };
 
   const addItem = (): void => {
-    const updatedModel = [...model, { label: "", value: "", id: 0 }];
+    const updatedModel = [...model, { label: "", value: "", id: 0n }];
     setModel(updatedModel);
     onChange(updatedModel);
   };

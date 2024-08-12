@@ -1,38 +1,21 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 import { useQuery } from "@tanstack/react-query";
 import request from "graphql-request";
-import {
-  Address,
-  encodeFunctionData,
-  encodePacked,
-  getAddress,
-  Hex,
-  keccak256,
-} from "viem";
+import { Address, encodePacked, getAddress, keccak256 } from "viem";
 
-import easAbi from "@/abi/eas";
 import spaceAbi from "@/abi/space";
+import useSpaceCache from "@/hooks/useSpaceCache";
 import ItemEditor, { type Item } from "@/components/__common/ItemEditor";
 import { graphql } from "@/gql/gql";
-import { accountType, gasManagerConfig } from "@/alchemy";
+import { accountType } from "@/alchemy";
 
 import styles from "./page.module.css";
 import { readContract } from "@wagmi/core";
-import {
-  useAccount,
-  useSendUserOperation,
-  useSignerStatus,
-  useSmartAccountClient,
-} from "@alchemy/aa-alchemy/react";
+import { useAccount, useSignerStatus } from "@alchemy/aa-alchemy/react";
 import { getConfig } from "@/wagmi";
 import ReorderableItemList from "@/components/space/ReorderableList";
-
-const easContractAddress = "0x4200000000000000000000000000000000000021";
-const schemaUID =
-  "0x5e331c5631c07b6df8b7e28a30cf3ea91d33af545e84e3b0aaf4c12dc3fea507";
 
 const spaceAttestationQuery = graphql(/* GraphQL */ `
   query SpaceAttestation($recipient: String, $context: String) {
@@ -73,18 +56,29 @@ const Space: React.FC<Props> = ({ params }: Props) => {
     type: accountType,
   });
 
+  const {
+    state,
+    setInitialName,
+    setInitialBio,
+    setInitialLinks,
+    setInitialIsEndorsed,
+    setInitialEndorsementReason,
+    updateBio,
+    updateName,
+    updateLinks,
+    updateIsEndorsed,
+    updateEndorsementReason,
+    isSaved,
+  } = useSpaceCache(address as Address);
+
   const [formVisible, setFormVisible] = useState(false);
   const [item, setItem] = useState<Item | undefined>(undefined);
   const [nameEditorVisible, setNameEditorVisible] = useState(false);
-  const [name, setName] = useState("");
+  const [nameInput, setNameInput] = useState("");
   const [bioEditorVisible, setBioEditorVisible] = useState(false);
-  const [bio, setBio] = useState("");
+  const [bioInput, setBioInput] = useState("");
 
   const { isConnected } = useSignerStatus();
-  const { client } = useSmartAccountClient({
-    type: accountType,
-    gasManagerConfig,
-  });
 
   const getLinkId = (link: { value: string; label: string }): bigint => {
     return BigInt(
@@ -136,19 +130,6 @@ const Space: React.FC<Props> = ({ params }: Props) => {
       });
     },
   });
-  const linkItems = useMemo<Item[]>(() => {
-    if (linksRequest.data) {
-      return linksRequest.data.map((link) => ({
-        label: link.label,
-        value: link.value,
-        id: parseInt(getLinkId(link).toString()),
-      }));
-    }
-    return [];
-  }, [linksRequest.data]);
-
-  const { sendUserOperation, sendUserOperationResult, isSendingUserOperation } =
-    useSendUserOperation({ client, waitForTxn: true });
 
   const owner = useMemo(() => ownerRequest.data, [ownerRequest]);
   const isOwner = useMemo<boolean>(
@@ -156,7 +137,7 @@ const Space: React.FC<Props> = ({ params }: Props) => {
     [owner, accountAddress]
   );
 
-  const { data: spaceAttestations } = useQuery({
+  const attestationsRequest = useQuery({
     queryKey: ["spaceAttestations", owner, accountAddress],
     queryFn: async () =>
       request(
@@ -169,132 +150,105 @@ const Space: React.FC<Props> = ({ params }: Props) => {
       ),
   });
 
-  const isEndorsed = useMemo<boolean>(
-    () =>
-      spaceAttestations
-        ? spaceAttestations.personalAttestation.length > 0
-        : false,
-    [spaceAttestations]
-  );
+  // const isEndorsed = useMemo<boolean>(
+  //   () =>
+  //     spaceAttestations
+  //       ? spaceAttestations.personalAttestation.length > 0
+  //       : false,
+  //   [spaceAttestations]
+  // );
 
   useEffect(() => {
-    if (sendUserOperationResult) {
-      linksRequest.refetch();
-      nameRequest.refetch();
-      bioRequest.refetch();
-    }
-  });
+    linksRequest.refetch();
+    nameRequest.refetch();
+    bioRequest.refetch();
+    attestationsRequest.refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
-    setBio(bioRequest.data || "");
+    setInitialBio(bioRequest.data || "");
+    setBioInput(bioRequest.data || "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bioRequest.data]);
 
   useEffect(() => {
-    setName(nameRequest.data || "");
+    setInitialName(nameRequest.data || "");
+    setNameInput(nameRequest.data || "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nameRequest.data]);
 
+  useEffect(() => {
+    setInitialLinks(
+      (linksRequest.data || []).map((link) => ({
+        label: link.label,
+        value: link.value,
+        id: getLinkId(link),
+      }))
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [linksRequest.data]);
+
+  useEffect(() => {
+    const attestationData = attestationsRequest.data;
+    if (!attestationData) return;
+    const isEndorsed = attestationData.personalAttestation.length > 0;
+    setInitialIsEndorsed(isEndorsed);
+    setInitialEndorsementReason("");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attestationsRequest.data]);
+
   const removeItem = (index: number) => {
-    if (!linksRequest.data || !address) return;
-    const prevItem = linksRequest.data[index - 1];
+    if (!state.links || !address) return;
+    const prevItem = state.links[index - 1];
     const prevId = prevItem ? getLinkId(prevItem) : 0n;
-    sendUserOperation({
-      uo: {
-        target: address as Address,
-        data: encodeFunctionData({
-          abi: spaceAbi,
-          functionName: "removeLink",
-          args: [prevId],
-        }),
-      },
-    });
+    updateLinks({ type: "remove", prevId });
   };
 
   const addItem = () => {
-    if (!linksRequest.data || !address || !item) return;
-    const prevItem = linksRequest.data[linksRequest.data.length - 1];
+    if (!state.links || !address || !item) return;
+    const prevItem = state.links[state.links.length - 1];
     const prevId = prevItem ? getLinkId(prevItem) : 0n;
-    sendUserOperation({
-      uo: {
-        target: address as Address,
-        data: encodeFunctionData({
-          abi: spaceAbi,
-          functionName: "addLink",
-          args: [prevId, item.label, item.value],
-        }),
-      },
-    });
+    updateLinks({ type: "add", prevId, item });
     setFormVisible(false);
   };
 
   const endorse = () => {
     if (!address) return;
-    const schemaEncoder = new SchemaEncoder("string reason");
-    const encodedData = schemaEncoder.encodeData([
-      { name: "reason", value: "", type: "string" },
-    ]) as Hex;
-    sendUserOperation({
-      uo: {
-        target: easContractAddress,
-        data: encodeFunctionData({
-          abi: easAbi,
-          functionName: "attest",
-          args: [
-            {
-              schema: schemaUID,
-              data: {
-                data: encodedData,
-                revocable: true,
-                recipient: address as Address,
-                refUID:
-                  "0x0000000000000000000000000000000000000000000000000000000000000000",
-                value: 0n,
-                expirationTime: 0n,
-              },
-            },
-          ],
-        }),
-      },
-    });
+    const reason = "";
+    updateIsEndorsed(true);
+    updateEndorsementReason(reason);
+  };
+
+  const handleNameInputChange = (value: string) => {
+    setNameInput(value);
   };
 
   const saveName = () => {
     if (!address) return;
-    sendUserOperation({
-      uo: {
-        target: address as Address,
-        data: encodeFunctionData({
-          abi: spaceAbi,
-          functionName: "setName",
-          args: [name],
-        }),
-      },
-    });
+    updateName(nameInput);
     setNameEditorVisible(false);
+  };
+
+  const handleBioInputChange = (value: string) => {
+    setBioInput(value);
+    updateBio(value);
   };
 
   const saveBio = () => {
     if (!address) return;
-    sendUserOperation({
-      uo: {
-        target: address as Address,
-        data: encodeFunctionData({
-          abi: spaceAbi,
-          functionName: "setBio",
-          args: [bio],
-        }),
-      },
-    });
+    updateBio(bioInput);
     setBioEditorVisible(false);
   };
 
   function handleCancelNameClick() {
     setNameEditorVisible(false);
-    setName(nameRequest.data || "");
+    setNameInput(nameRequest.data || "");
   }
 
   function handleCancelBioClick() {
     setBioEditorVisible(false);
-    setBio(bioRequest.data || "");
+    setBioInput(bioRequest.data || "");
   }
 
   function handleCancelClick() {
@@ -310,32 +264,27 @@ const Space: React.FC<Props> = ({ params }: Props) => {
   function handleItemsChange(items: Item[], dragItem: Item, hoverItem: Item) {
     // Get the item that was moved
     const movedItem = dragItem;
-    const oldIndex = linkItems.findIndex((item) => item.id === movedItem.id);
+    const oldIndex = state.links.findIndex((item) => item.id === movedItem.id);
     // Get the old preceding (prev) item
-    const oldPrevItem = oldIndex > 0 ? linkItems[oldIndex - 1] : undefined;
+    const oldPrevItem = oldIndex > 0 ? state.links[oldIndex - 1] : undefined;
     const oldPrevItemId = oldPrevItem ? getLinkId(oldPrevItem) : 0n;
     // Get the new preceding (prev) item
-    const hoverItemIndex = linkItems.findIndex(
+    const hoverItemIndex = state.links.findIndex(
       (item) => item.id === hoverItem.id
     );
     const newPrevItem =
-      hoverItemIndex > 0 ? linkItems[hoverItemIndex - 1] : undefined;
+      hoverItemIndex > 0 ? state.links[hoverItemIndex - 1] : undefined;
     const newPrevItemId = newPrevItem ? getLinkId(newPrevItem) : 0n;
     // Call "reorderLink" with the old preceding item's ID and the new preceding item's ID
-    sendUserOperation({
-      uo: {
-        target: address as Address,
-        data: encodeFunctionData({
-          abi: spaceAbi,
-          functionName: "reorderLink",
-          args: [oldPrevItemId, newPrevItemId],
-        }),
-      },
+    updateLinks({
+      type: "reorder",
+      oldPrevId: oldPrevItemId,
+      newPrevId: newPrevItemId,
     });
   }
 
   function handleItemRemove(item: Item) {
-    const index = linkItems.findIndex((i) => i.id === item.id);
+    const index = state.links.findIndex((i) => i.id === item.id);
     removeItem(index);
   }
 
@@ -345,16 +294,14 @@ const Space: React.FC<Props> = ({ params }: Props) => {
         <div className={styles.view}>
           <div className={styles.personal}>
             <div className={styles.name}>
-              {nameRequest.data && !nameEditorVisible && (
-                <div>{nameRequest.data}</div>
-              )}
+              {state.name && !nameEditorVisible && <div>{state.name}</div>}
               {isOwner && (
                 <div className={styles.nameEditor}>
                   {nameEditorVisible ? (
                     <>
                       <input
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        value={nameInput}
+                        onChange={(e) => handleNameInputChange(e.target.value)}
                         placeholder="Your name"
                       />
                       <div className={styles.buttons}>
@@ -372,26 +319,24 @@ const Space: React.FC<Props> = ({ params }: Props) => {
                   ) : (
                     <button
                       className={styles.button}
-                      disabled={!isConnected || isSendingUserOperation}
+                      disabled={!isConnected}
                       onClick={() => setNameEditorVisible(true)}
                     >
-                      {nameRequest.data ? "Edit" : "Add name"}
+                      {state.name ? "Edit" : "Add name"}
                     </button>
                   )}
                 </div>
               )}
             </div>
             <div className={styles.bio}>
-              {bioRequest.data && !bioEditorVisible && (
-                <div>{bioRequest.data}</div>
-              )}
+              {state.bio && !bioEditorVisible && <div>{state.bio}</div>}
               {isOwner && (
                 <div className={styles.bioEditor}>
                   {bioEditorVisible ? (
                     <>
                       <input
-                        value={bio}
-                        onChange={(e) => setBio(e.target.value)}
+                        value={bioInput}
+                        onChange={(e) => handleBioInputChange(e.target.value)}
                         placeholder="Your bio"
                       />
                       <div className={styles.buttons}>
@@ -409,10 +354,10 @@ const Space: React.FC<Props> = ({ params }: Props) => {
                   ) : (
                     <button
                       className={styles.button}
-                      disabled={!isConnected || isSendingUserOperation}
+                      disabled={!isConnected}
                       onClick={() => setBioEditorVisible(true)}
                     >
-                      {bioRequest.data ? "Edit" : "Add bio"}
+                      {state.bio ? "Edit" : "Add bio"}
                     </button>
                   )}
                 </div>
@@ -421,30 +366,34 @@ const Space: React.FC<Props> = ({ params }: Props) => {
           </div>
           {accountAddress && !isOwner && (
             <div>
-              {!isEndorsed ? (
+              {!state.endorsement ? (
                 <button
                   className="button"
-                  disabled={!isConnected || isSendingUserOperation}
+                  disabled={!isConnected}
                   onClick={endorse}
                 >
                   Endorse
                 </button>
               ) : (
-                <div className={styles.endorsed}>Endorsed by you</div>
+                <div className={styles.endorsed}>
+                  Endorsed by you{" "}
+                  {state.endorsement.reason
+                    ? `(${state.endorsement.reason}`
+                    : ""}
+                </div>
               )}
             </div>
           )}
-          {linksRequest.data && (
+          {state.links && (
             <div className={styles.list}>
               {isOwner ? (
                 <ReorderableItemList
-                  items={linkItems}
+                  items={state.links}
                   onItemsChange={handleItemsChange}
                   onItemRemove={handleItemRemove}
-                  disabled={isSendingUserOperation}
                 />
               ) : (
-                linksRequest.data.map((link, index) => (
+                state.links.map((link, index) => (
                   <div key={index} className={styles.item}>
                     <div className={styles.link}>
                       <div className={styles.label}>{link.label}</div>
@@ -460,7 +409,6 @@ const Space: React.FC<Props> = ({ params }: Props) => {
                       <ItemEditor initialItem={item} onChange={setItem} />
                       <div className={styles.buttons}>
                         <button
-                          disabled={isSendingUserOperation}
                           className={`${styles.button} ${styles.ghost} ${styles.large}`}
                           onClick={() => handleSaveClick()}
                         >
@@ -484,6 +432,42 @@ const Space: React.FC<Props> = ({ params }: Props) => {
                   )}
                 </div>
               )}
+            </div>
+          )}
+          {isOwner && (
+            <div
+              className={`${styles.status} ${isSaved ? styles.saved : styles.pending}`}
+            >
+              {isSaved ? (
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 15 15"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fill="currentColor"
+                    fill-rule="evenodd"
+                    d="M7.5.877a6.623 6.623 0 1 0 0 13.246A6.623 6.623 0 0 0 7.5.877M1.827 7.5a5.673 5.673 0 1 1 11.346 0a5.673 5.673 0 0 1-11.346 0m8.332-1.962a.5.5 0 0 0-.818-.576L6.52 8.972L5.357 7.787a.5.5 0 0 0-.714.7L6.227 10.1a.5.5 0 0 0 .765-.062z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 15 15"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fill="currentColor"
+                    fill-rule="evenodd"
+                    d="M.877 7.5a6.623 6.623 0 1 1 13.246 0a6.623 6.623 0 0 1-13.246 0M7.5 1.827a5.673 5.673 0 1 0 0 11.346a5.673 5.673 0 0 0 0-11.346"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              )}
+              {isSaved ? "All saved" : "Changes pending"}
             </div>
           )}
         </div>

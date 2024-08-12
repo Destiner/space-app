@@ -9,7 +9,7 @@ import styles from "./ReorderableList.module.css";
 import { type Item } from "@/components/__common/ItemEditor";
 
 export interface CardProps {
-  id: any;
+  id: bigint;
   index: number;
   moveCard: (dragIndex: number, hoverIndex: number) => void;
   children: React.ReactNode;
@@ -21,7 +21,7 @@ interface DragItem {
   type: string;
 }
 
-const Card: FC<CardProps> = ({ id, index, moveCard, children }) => {
+const Card: FC<CardProps> = ({ id, index, moveCard, children }: CardProps) => {
   const type = "card";
 
   const ref = useRef<HTMLDivElement>(null);
@@ -114,7 +114,7 @@ interface ReorderableItemListProps {
   items: Item[];
   onItemsChange: (items: Item[], dragItem: Item, hoverItem: Item) => void;
   onItemRemove: (item: Item) => void;
-  disabled: boolean;
+  disabled?: boolean;
 }
 
 const ReorderableItemList: FC<ReorderableItemListProps> = ({
