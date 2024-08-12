@@ -91,12 +91,13 @@ app.frame("/space/:address", async (c) => {
           color: "white",
           display: "flex",
           alignItems: "center",
+          flexDirection: "column",
+          gap: "16px",
           height: "100%",
-          fontSize: 60,
         }}
       >
-        <div>{name}</div>
-        <div>{bio}</div>
+        <div style={{ fontSize: 120, color: "#fafafa" }}>{name}</div>
+        <div style={{ fontSize: 40, color: "#e3e3e3" }}>{bio}</div>
       </div>
     ),
     intents: [
