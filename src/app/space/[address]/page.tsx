@@ -16,10 +16,15 @@ const Space: React.FC<Props> = ({ params }: Props) => {
   return <SpaceView address={address} />;
 };
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const address = params.address;
+  console.log("address", address);
   const url = process.env.VERCEL_URL || "http://localhost:3000";
   console.log("url", url);
-  const frameMetadata = await getFrameMetadata(`${url}/api/frame`);
+  const frameMetadata = await getFrameMetadata(
+    `${url}/api/frame/space/${address}`
+  );
+  console.log("frameMetadata", frameMetadata);
   return {
     other: frameMetadata,
   };
