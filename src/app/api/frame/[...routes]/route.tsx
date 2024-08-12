@@ -93,7 +93,7 @@ app.frame("/space/:address", async (c) => {
           alignItems: "center",
           justifyContent: "center",
           flexDirection: "column",
-          gap: "16px",
+          gap: "8px",
           height: "100%",
         }}
       >
