@@ -15,7 +15,7 @@ const app = new Frog({
   title: "Frog Frame",
 });
 
-export const runtime = "edge";
+// export const runtime = "edge";
 
 app.frame("/space/:address", async (c) => {
   const { buttonValue, status } = c;
