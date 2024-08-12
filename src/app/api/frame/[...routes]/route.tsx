@@ -14,9 +14,7 @@ const app = new Frog({
 });
 
 app.frame("/space/:address", async (c) => {
-  console.log("space 1");
   const spaceAddress = c.req.param("address") as Address;
-  console.log("space 2");
 
   const result = await multicall(getConfig(), {
     contracts: [
@@ -38,12 +36,10 @@ app.frame("/space/:address", async (c) => {
       },
     ],
   });
-  console.log("space 3");
 
   const nameResult = result[0];
   const bioResult = result[1];
   const linksResult = result[2];
-  console.log("space 4");
 
   if (
     nameResult.status === "failure" ||
@@ -58,12 +54,11 @@ app.frame("/space/:address", async (c) => {
       ),
     });
   }
-  console.log("space 5");
 
   const name = nameResult.result;
   const bio = bioResult.result;
   const links = linksResult.result;
-  console.log("space 6", name, bio, links);
+  console.log("space", name, bio, links);
 
   return c.res({
     image: (
