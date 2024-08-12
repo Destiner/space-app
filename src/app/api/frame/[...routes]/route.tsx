@@ -97,8 +97,8 @@ app.frame("/space/:address", async (c) => {
           height: "100%",
         }}
       >
-        <div style={{ fontSize: 120, color: "#fafafa" }}>{name}</div>
-        <div style={{ fontSize: 40, color: "#e3e3e3" }}>{bio}</div>
+        <div style={{ fontSize: 80, color: "#fafafa" }}>{name}</div>
+        <div style={{ fontSize: 55, color: "#e3e3e3" }}>{bio}</div>
       </div>
     ),
     intents: [
