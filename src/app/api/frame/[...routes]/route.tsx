@@ -3,11 +3,27 @@ import { Button, Frog } from "frog";
 import { handle } from "frog/next";
 import { createSystem } from "frog/ui";
 
+const urlFont = await fetch("https://...").then((res) => res.arrayBuffer());
+
 const { Box, Heading, Text, VStack } = createSystem();
 
 const app = new Frog({
   basePath: "/api/frame",
   title: "Frog Frame",
+  imageOptions: {
+    fonts: [
+      {
+        name: "Open Sans",
+        weight: 400,
+        source: "google",
+      },
+      {
+        name: "Open Sans",
+        weight: 700,
+        source: "google",
+      },
+    ],
+  },
 });
 
 export const runtime = "edge";
@@ -18,6 +34,8 @@ app.frame("/space", (c) => {
     image: (
       <Box
         grow
+        fontFamily={{ custom: "Open Sans" }}
+        fontWeight="400"
         alignVertical="center"
         backgroundColor="background"
         padding="32"
