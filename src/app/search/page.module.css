@@ -1,0 +1,80 @@
+.page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.content {
+  margin-top: 64px;
+  max-width: 640px;
+  width: 100%;
+  gap: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.input {
+  font-size: 20px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sectionHeading {
+  text-align: center;
+  font-size: 22px;
+  color: #333;
+}
+
+.sectionItems {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.sectionItem {
+  text-decoration: none;
+  color: black;
+  border: 1px solid #ddd;
+  padding: 16px 32px;
+  border-radius: 4px;
+}
+
+.sectionItem:hover {
+  background-color: #f9f9f9;
+  cursor: pointer;
+}
+
+.resultsEmpty {
+  font-size: 16px;
+  color: #666;
+}
+
+.itemSpaceName {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.itemSpaceBio {
+  font-size: 16px;
+  color: #666;
+}
+
+.itemLinkLabel {
+  text-transform: uppercase;
+  font-size: 14px;
+  color: #666;
+}
+
+.itemLinkValue {
+  font-size: 16px;
+  color: #333;
+}

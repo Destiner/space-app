@@ -6,7 +6,6 @@ import {
   AddLink,
   NewOwner,
   RemoveLink,
-  ReorderLink,
   NewName,
   NewBio,
 } from "../generated/templates/Space/Space";
