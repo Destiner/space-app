@@ -83,6 +83,8 @@ app.frame("/space/:address", async (c) => {
   const links = linksResult.result;
   const topLinks = links.slice(0, 4);
 
+  console.log(topLinks);
+
   return c.res({
     image: (
       <div
@@ -102,10 +104,8 @@ app.frame("/space/:address", async (c) => {
       </div>
     ),
     intents: [
-      topLinks.map((link) => (
-        // eslint-disable-next-line react/jsx-key
-        <Button.Link href={link.value}>{link.label}</Button.Link>
-      )),
+      // eslint-disable-next-line react/jsx-key
+      <Button.Link href="https://google.com">Google</Button.Link>,
     ],
   });
 });
