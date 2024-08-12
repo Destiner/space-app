@@ -90,6 +90,7 @@ app.frame("/space/:address", async (c) => {
           background: "black",
           color: "white",
           display: "flex",
+          alignItems: "center",
           height: "100%",
           fontSize: 60,
         }}
