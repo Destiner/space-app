@@ -2,6 +2,8 @@
 import { Button, Frog, TextInput } from "frog";
 import { handle } from "frog/next";
 
+import { Box, Heading, Text, VStack, vars } from "../ui.js";
+
 const app = new Frog({
   basePath: "/api/frame",
   title: "Frog Frame",
@@ -13,11 +15,22 @@ app.frame("/space", (c) => {
   const { buttonValue, status } = c;
   return c.res({
     image: (
-      <div style={{ color: "white", display: "flex", fontSize: 60 }}>
-        {status === "initial"
-          ? "Select your fruit!"
-          : `Selected: ${buttonValue}`}
-      </div>
+      <Box
+        grow
+        alignVertical="center"
+        backgroundColor="background"
+        padding="32"
+      >
+        <VStack gap="4">
+          <Heading>FrogUI 🐸</Heading>
+          <Text color="text200" size="20">
+            Build consistent frame experiences
+          </Text>
+          <Text color="text400" size="20">
+            with Frog.
+          </Text>
+        </VStack>
+      </Box>
     ),
     intents: [
       // eslint-disable-next-line react/jsx-key
